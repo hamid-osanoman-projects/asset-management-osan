@@ -285,7 +285,33 @@ a {
     border-radius: var(--radius);
     width: 90%;
     max-width: 500px;
+    max-height: 90vh;
+    /* Prevent modal from being taller than screen */
+    overflow-y: auto;
+    /* Allow scrolling if content is too long */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* QR Preview Box - Force size on screen, but allow high res generation */
+.qr-preview-box {
+    width: 128px;
+    height: 128px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: white;
+    padding: 4px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-preview-box img,
+.qr-preview-box canvas {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
 }
 
 .modal-header {

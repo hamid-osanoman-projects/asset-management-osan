@@ -321,7 +321,23 @@ const dataManager = {
     },
 
     async deleteEmployee(id) {
-        if (!confirm('Are you sure you want to delete this employee? This will also unassign their assets.')) return;
+        // Check for assigned assets first
+        const { count, error: countError } = await window.supabaseClient
+            .from('assets')
+            .select('*', { count: 'exact', head: true })
+            .eq('employee_id', id);
+
+        if (countError) {
+            alert('Error checking assets: ' + countError.message);
+            return;
+        }
+
+        if (count > 0) {
+            alert(`Cannot delete this employee because they have ${count} assigned asset(s). Please unassign the assets first.`);
+            return;
+        }
+
+        if (!confirm('Are you sure you want to delete this employee?')) return;
 
         const { error } = await window.supabaseClient
             .from('employees')
@@ -396,8 +412,8 @@ const dataManager = {
                    <p class="text-sm font-mono mt-1">${emp.custom_id || ''}</p>
                 </div>
                 <div class="flex flex-col items-end gap-2">
-                    <!-- Adjusted size for display, but generates large image -->
-                    <div id="modal-qr-preview" class="bg-white p-1 border rounded" style="width: 128px; height: 128px;"></div> 
+                    <!-- Adjusted size for display via CSS class -->
+                    <div id="modal-qr-preview" class="qr-preview-box"></div> 
                     <button type="button" onclick="dataManager.downloadQR('modal-qr-preview', '${emp.name}')" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.8rem;">
                         Download QR
                     </button>
@@ -419,19 +435,13 @@ const dataManager = {
             const url = window.location.href.replace('admin.html', 'employee.html').split('#')[0] + `?id=${emp.id}`;
             new QRCode(qrContainer, {
                 text: url,
-                width: 256, // High Res for Download
-                height: 256,
+                width: 512, // High High Res for Download (can go higher if needed)
+                height: 512,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M
+                correctLevel: QRCode.CorrectLevel.H // High error correction
             });
-
-            // Force display size to prevent it from exploding the modal
-            const img = qrContainer.querySelector('img');
-            if (img) {
-                img.style.width = '100%';
-                img.style.height = '100%';
-            }
+            // No need to force inline style sizes here anymore, CSS handles .qr-preview-box children
         }, 100);
     },
 
