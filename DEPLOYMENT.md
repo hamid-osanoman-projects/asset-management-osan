@@ -40,6 +40,14 @@
 3.  Select `main` branch and `/` root folder.
 4.  Save. Your site will be live at `https://username.github.io/repo-name`.
 
+    **Custom Domain (Optional):**
+    - Under **Pages** settings, in the "Custom domain" field, enter your domain (e.g., `assets.mycompany.com`).
+    - Click **Save**.
+    - In your DNS provider (GoDaddy, Namecheap, etc.), create a **CNAME record**:
+        - **Host**: `assets` (or `@` for root domain)
+        - **Value**: `username.github.io`
+    - Wait for DNS propagation (can take up to 24h).
+
 ### Option B: Vercel
 1.  Install Vercel CLI or go to [vercel.com](https://vercel.com).
 2.  Import your GitHub repository.

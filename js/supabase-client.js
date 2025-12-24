@@ -8,6 +8,6 @@ if (SUPABASE_URL === 'https://lizriuedwqhvhcotfyvb.supabase.co' || SUPABASE_ANON
 }
 
 // Initialize the Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-window.supabaseClient = supabase;
+window.supabaseClient = client;
