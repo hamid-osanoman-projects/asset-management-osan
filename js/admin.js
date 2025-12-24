@@ -87,7 +87,8 @@ const ui = {
             // Clear prev
             qrContainer.innerHTML = '';
             // URL
-            const url = `${window.location.origin}/employee.html?id=${emp.id}`;
+            // URL: Use replace on current HREF to keep the repo path (for GitHub Pages)
+            const url = window.location.href.replace('admin.html', 'employee.html').split('#')[0] + `?id=${emp.id}`;
             new QRCode(qrContainer, {
                 text: url,
                 width: 64,
