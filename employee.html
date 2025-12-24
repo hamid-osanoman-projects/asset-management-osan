@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <div class="container" style="max-width: 480px;">
+        <div class="text-center mt-4 mb-4">
+            <h3>Asset Manager</h3>
+            <p style="color: var(--text-muted); font-size: 0.8rem;">Public Verification</p>
+        </div>
+
+        <div id="loading" class="text-center mt-4">
+            <p>Loading employee data...</p>
+        </div>
+
+        <div id="error" class="hidden text-center card" style="border-left: 4px solid var(--danger-color);">
+            <p style="color: var(--danger-color);">Employee not found or invalid QR code.</p>
+        </div>
+
+        <div id="profile" class="hidden">
+            <!-- Employee Card -->
+            <div class="card" style="text-align: center;">
+                <div
+                    style="width: 80px; height: 80px; background: var(--bg-color); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                    👤
+                </div>
+                <h2 id="emp-name">Name</h2>
+                <p id="emp-dept" style="color: var(--text-muted);">Department</p>
+                <p id="emp-email" style="font-size: 0.8rem; margin-top: 0.5rem;">Email</p>
+            </div>
+
+            <h4 class="mb-4 mt-4" style="padding-left: 0.5rem; border-left: 3px solid var(--accent-color);">Assigned
+                Assets</h4>
+
+            <div id="asset-list" class="flex-col gap-4">
+                <!-- Assets go here -->
+            </div>
+
+            <div class="text-center mt-4" style="font-size: 0.7rem; color: var(--text-muted);">
+                <p>Verified at: <span id="timestamp"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/supabase-client.js"></script>
+    <script src="js/public.js"></script>
+</body>
+
+</html>
