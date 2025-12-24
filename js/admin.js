@@ -95,67 +95,37 @@ const ui = {
         document.getElementById('edit-modal').classList.add('hidden');
     },
 
-    renderEmployeeCard(emp) {
+    // Compact List Item Render
+    renderEmployeeItem(emp) {
         const div = document.createElement('div');
-        div.className = 'card';
+        div.className = 'list-item';
+        div.onclick = (e) => {
+            // Prevent opening details if clicking action buttons
+            if (e.target.closest('button') || e.target.closest('a')) return;
+            dataManager.openEmployeeDetails(emp.id);
+        };
+
         div.innerHTML = `
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3>${emp.name}</h3>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">${emp.company || ''}</p>
-                    <p style="font-size: 0.8rem;">${emp.email}</p>
-                    ${emp.custom_id ? `<span class="status-badge" style="background:#eee; color:#333; margin-top:4px; display:inline-block;">${emp.custom_id}</span>` : ''}
+            <div class="list-item-info">
+                <div class="list-item-title">${emp.name}</div>
+                <div class="list-item-subtitle">
+                    ${emp.custom_id ? `<span style="font-weight: 600; color: #333;">${emp.custom_id}</span> • ` : ''}
+                    ${emp.company || 'No Company'}
                 </div>
-                <!-- Container with fixed CSS size -->
-                <div id="qr-${emp.id}" class="card-qr-preview"></div>
             </div>
-            <div class="mt-4 flex justify-between items-center">
-                <div id="qr-${emp.id}" class="hidden"></div> <!-- Hidden by default, only used for data -->
-            </div>
-            <div class="mt-4 flex justify-between items-center border-t pt-3" style="border-color: var(--border-color);">
-                <div class="flex gap-2">
-                    <button onclick="dataManager.viewEmployeeAssets('${emp.id}', '${emp.name}')" class="icon-btn" title="View Assigned Assets">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-</svg>
-                    </button>
-                    <button onclick="dataManager.openEditEmployee('${emp.id}')" class="icon-btn" title="Edit Employee">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <div class="list-item-actions">
+                <button onclick="dataManager.openEditEmployee('${emp.id}')" class="icon-btn" title="Edit">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
   <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
 </svg>
-                    </button>
-                    <a href="employee.html?id=${emp.id}" target="_blank" class="icon-btn" title="View Public Profile">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-</svg>
-                    </a>
-                </div>
-                <button onclick="dataManager.deleteEmployee('${emp.id}')" class="icon-btn delete" title="Delete Employee">
+                </button>
+                <button onclick="dataManager.deleteEmployee('${emp.id}')" class="icon-btn delete" title="Delete">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
   <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
 </svg>
                 </button>
             </div>
         `;
-
-        // Generate QR
-        setTimeout(() => {
-            const qrContainer = div.querySelector(`#qr-${emp.id}`);
-            // Clear prev
-            qrContainer.innerHTML = '';
-            // URL: Use replace on current HREF to keep the repo path (for GitHub Pages)
-            const url = window.location.href.replace('admin.html', 'employee.html').split('#')[0] + `?id=${emp.id}`;
-            new QRCode(qrContainer, {
-                text: url,
-                width: 256, // Increased resolution for better scanning
-                height: 256,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M // Medium correction for clearer code
-            });
-        }, 0);
-
         return div;
     },
 
@@ -215,7 +185,7 @@ const dataManager = {
         }
 
         data.forEach(emp => {
-            list.appendChild(ui.renderEmployeeCard(emp));
+            list.appendChild(ui.renderEmployeeItem(emp)); // Changed from renderEmployeeCard
         });
     },
 
@@ -509,6 +479,100 @@ const dataManager = {
         // A simple way is to reset the modal state when it opens again for editing.
         // We should update openModal to handle this better, but for now this 'hack' works if openModal resets buttons.
         // Let's modify openModal instead to be safer.
+    },
+
+    async openEmployeeDetails(id) {
+        // Fetch full employee and their assets
+        const { data: emp, error: eErr } = await window.supabaseClient.from('employees').select('*').eq('id', id).single();
+        const { data: assets, error: aErr } = await window.supabaseClient.from('assets').select('*').eq('employee_id', id);
+
+        if (eErr || !emp) { console.error(eErr); return; }
+
+        // Build Asset List HTML
+        let assetHtml = '<p class="text-muted text-sm italic">No assets assigned.</p>';
+        if (assets && assets.length > 0) {
+            assetHtml = `<div class="flex flex-col gap-2">`;
+            assets.forEach(asset => {
+                assetHtml += `
+                    <div style="border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 4px; background: #f9fafb;">
+                        <div class="flex justify-between">
+                            <span style="font-size:0.85rem; font-weight:600;">${asset.brand} ${asset.type}</span>
+                            <span style="font-size:0.75rem; background:#fff; border:1px solid #ccc; padding:0 4px; border-radius:3px;">${asset.status}</span>
+                        </div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">S/N: ${asset.serial_number}</div>
+                    </div>
+                 `;
+            });
+            assetHtml += `</div>`;
+        }
+
+        const content = `
+            <!-- Info Section -->
+            <div class="detail-section">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="detail-label">Full Name</div>
+                        <div class="detail-value">${emp.name}</div>
+                    </div>
+                     <div>
+                        <div class="detail-label">ID</div>
+                        <div class="detail-value">${emp.custom_id || 'N/A'}</div>
+                    </div>
+                </div>
+                 <div class="mt-3">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value text-sm">${emp.email}</div>
+                 </div>
+                  <div class="mt-3">
+                    <div class="detail-label">Company</div>
+                    <div class="detail-value">${emp.company || 'N/A'}</div>
+                 </div>
+            </div>
+            
+            <!-- Assets Section -->
+             <div class="detail-section">
+                <div class="detail-label mb-2">Assigned Assets</div>
+                ${assetHtml}
+             </div>
+             
+             <!-- QR Section -->
+              <div class="detail-section" style="border:none; text-align:center;">
+                <div class="detail-label mb-2">Employee QR Code</div>
+                <div id="detail-qr-view" style="display:inline-block; padding:10px; background:white; border:1px solid #ddd; border-radius:8px;"></div>
+                <div class="mt-3">
+                    <button onclick="dataManager.downloadQR('detail-qr-view', '${emp.name}')" class="btn btn-outline w-full">
+                        Download QR
+                    </button>
+                    <a href="employee.html?id=${emp.id}" target="_blank" class="block mt-2 text-center text-sm text-accent underline">View Public Page</a>
+                </div>
+              </div>
+         `;
+
+        // Open Modal (Generic)
+        ui.openModal(`Employee Details`, content, null); // Null callback means read-only/no form save
+
+        // Hide Save Button logic (similar to view assets)
+        const form = document.getElementById('edit-form');
+        const btns = form.querySelectorAll('button');
+        if (btns.length >= 2) {
+            btns[0].textContent = "Close";
+            btns[0].onclick = () => ui.closeModal();
+            btns[1].classList.add('hidden');
+        }
+
+        // Generate High Res QR
+        setTimeout(() => {
+            const qrContainer = document.getElementById('detail-qr-view');
+            const url = window.location.href.replace('admin.html', 'employee.html').split('#')[0] + `?id=${emp.id}`;
+            new QRCode(qrContainer, {
+                text: url,
+                width: 256,
+                height: 256,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }, 100);
     },
 
     async generateCustomId(companyName) {
