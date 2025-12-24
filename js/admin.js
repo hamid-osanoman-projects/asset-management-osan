@@ -146,11 +146,11 @@ const ui = {
             const url = window.location.href.replace('admin.html', 'employee.html').split('#')[0] + `?id=${emp.id}`;
             new QRCode(qrContainer, {
                 text: url,
-                width: 64,
-                height: 64,
+                width: 256, // Increased resolution for better scanning
+                height: 256,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.L
+                correctLevel: QRCode.CorrectLevel.M // Medium correction for clearer code
             });
         }, 0);
 
@@ -385,15 +385,14 @@ const dataManager = {
             
             <div class="mt-4 p-4 border rounded bg-gray-50 flex items-center justify-between" style="border-color: var(--border-color);">
                 <div>
-                   <p class="font-bold text-sm">QR Code</p>
+                   <p class="font-bold text-sm">QR Code (High Res)</p>
                    <p class="text-xs text-muted">Scan to view profile</p>
                 </div>
-                <div class="flex gap-2 items-center">
-                    <div id="modal-qr-preview" class="bg-white p-1 border rounded"></div>
-                    <button type="button" onclick="dataManager.downloadQR('modal-qr-preview', '${emp.name}')" class="icon-btn" title="Download QR">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-</svg>
+                <div class="flex flex-col items-end gap-2">
+                    <!-- Adjusted size for display, but generates large image -->
+                    <div id="modal-qr-preview" class="bg-white p-1 border rounded" style="width: 128px; height: 128px;"></div> 
+                    <button type="button" onclick="dataManager.downloadQR('modal-qr-preview', '${emp.name}')" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.8rem;">
+                        Download QR
                     </button>
                 </div>
             </div>
@@ -414,12 +413,19 @@ const dataManager = {
             const url = window.location.href.replace('admin.html', 'employee.html').split('#')[0] + `?id=${emp.id}`;
             new QRCode(qrContainer, {
                 text: url,
-                width: 48,
-                height: 48,
+                width: 256, // High Res for Download
+                height: 256,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.L
+                correctLevel: QRCode.CorrectLevel.M
             });
+
+            // Force display size to prevent it from exploding the modal
+            const img = qrContainer.querySelector('img');
+            if (img) {
+                img.style.width = '100%';
+                img.style.height = '100%';
+            }
         }, 100);
     },
 
