@@ -58,3 +58,11 @@
 2.  Login with the admin user you created.
 3.  Create an employee and assign an asset.
 4.  Scan the generated QR code with your phone to verify the public page.
+
+## 7. Updating Your Site
+When you make changes to the code:
+1.  Commit your changes: `git commit -am "My updates"`
+2.  Push to GitHub: `git push`
+3.  **GitHub Pages will automatically rebuild and deploy.**
+    - This usually takes 30-60 seconds.
+    - You can check the status in your repository under the **Actions** tab.
