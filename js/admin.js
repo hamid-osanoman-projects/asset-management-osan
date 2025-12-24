@@ -396,11 +396,6 @@ const dataManager = {
                 <label class="input-label">Full Name</label>
                 <input type="text" name="name" class="input-field" value="${emp.name}" required>
             </div>
-            <div class="input-group">
-                <label class="input-label">Email</label>
-                <input type="email" name="email" class="input-field" value="${emp.email}" required>
-            </div>
-            <div class="input-group">
                 <label class="input-label">Email</label>
                 <input type="email" name="email" class="input-field" value="${emp.email}" required>
             </div>
@@ -415,7 +410,7 @@ const dataManager = {
                     <!-- Adjusted size for display via CSS class -->
                     <div id="modal-qr-preview" class="qr-preview-box"></div> 
                     <button type="button" onclick="dataManager.downloadQR('modal-qr-preview', '${emp.name}')" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.3rem 0.8rem;">
-                        Download QR
+                        Download
                     </button>
                 </div>
             </div>
