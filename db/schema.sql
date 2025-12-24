@@ -5,8 +5,10 @@ create extension if not exists "uuid-ossp";
 create table public.employees (
   id uuid primary key default uuid_generate_v4(),
   name text not null,
-  email text not null,
+  email text unique not null,
   department text not null,
+  company text,
+  custom_id text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

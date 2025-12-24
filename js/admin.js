@@ -104,6 +104,7 @@ const ui = {
                     <h3>${emp.name}</h3>
                     <p style="color: var(--text-muted); font-size: 0.9rem;">${emp.department}</p>
                     <p style="font-size: 0.8rem;">${emp.email}</p>
+                    ${emp.custom_id ? `<span class="status-badge" style="background:#eee; color:#333; margin-top:4px; display:inline-block;">${emp.custom_id}</span>` : ''}
                 </div>
                 <div id="qr-${emp.id}"></div>
             </div>
@@ -269,7 +270,9 @@ const dataManager = {
         const employee = {
             name: fd.get('name'),
             email: fd.get('email'),
-            department: fd.get('department')
+            department: fd.get('department'),
+            company: fd.get('company'),
+            custom_id: await this.generateCustomId(fd.get('company'))
         };
 
         const btn = e.target.querySelector('button');
@@ -371,6 +374,10 @@ const dataManager = {
 
         const fields = `
             <div class="input-group">
+                <label class="input-label">Company</label>
+                <input type="text" class="input-field" value="${emp.company || ''}" disabled style="background:#eee;">
+            </div>
+            <div class="input-group">
                 <label class="input-label">Full Name</label>
                 <input type="text" name="name" class="input-field" value="${emp.name}" required>
             </div>
@@ -387,6 +394,7 @@ const dataManager = {
                 <div>
                    <p class="font-bold text-sm">QR Code (High Res)</p>
                    <p class="text-xs text-muted">Scan to view profile</p>
+                   <p class="text-sm font-mono mt-1">${emp.custom_id || ''}</p>
                 </div>
                 <div class="flex flex-col items-end gap-2">
                     <!-- Adjusted size for display, but generates large image -->
@@ -492,6 +500,36 @@ const dataManager = {
         // A simple way is to reset the modal state when it opens again for editing.
         // We should update openModal to handle this better, but for now this 'hack' works if openModal resets buttons.
         // Let's modify openModal instead to be safer.
+    },
+
+    async generateCustomId(companyName) {
+        if (!companyName) return null;
+
+        let prefix = 'EMP';
+        if (companyName === 'Osan Studio') prefix = 'OST';
+        else if (companyName === 'Osbic') prefix = 'OSB';
+        else if (companyName === 'ASAS') prefix = 'AS';
+        else if (companyName === 'Maisarah') prefix = 'MSH';
+
+        // Find last ID with this prefix
+        const { data, error } = await window.supabaseClient
+            .from('employees')
+            .select('custom_id')
+            .ilike('custom_id', `${prefix}-%`)
+            .order('custom_id', { ascending: false })
+            .limit(1);
+
+        let nextNum = 1;
+        if (data && data.length > 0 && data[0].custom_id) {
+            const parts = data[0].custom_id.split('-');
+            if (parts.length === 2 && !isNaN(parts[1])) {
+                nextNum = parseInt(parts[1]) + 1;
+            }
+        }
+
+        // Format as 01, 02, etc.
+        const numStr = nextNum.toString().padStart(2, '0');
+        return `${prefix}-${numStr}`;
     },
 
     async openEditAsset(id) {
