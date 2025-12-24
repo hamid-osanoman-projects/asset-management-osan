@@ -102,7 +102,7 @@ const ui = {
             <div class="flex justify-between items-center">
                 <div>
                     <h3>${emp.name}</h3>
-                    <p style="color: var(--text-muted); font-size: 0.9rem;">${emp.department}</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">${emp.company || ''}</p>
                     <p style="font-size: 0.8rem;">${emp.email}</p>
                     ${emp.custom_id ? `<span class="status-badge" style="background:#eee; color:#333; margin-top:4px; display:inline-block;">${emp.custom_id}</span>` : ''}
                 </div>
@@ -270,7 +270,6 @@ const dataManager = {
         const employee = {
             name: fd.get('name'),
             email: fd.get('email'),
-            department: fd.get('department'),
             company: fd.get('company'),
             custom_id: await this.generateCustomId(fd.get('company'))
         };
@@ -386,8 +385,8 @@ const dataManager = {
                 <input type="email" name="email" class="input-field" value="${emp.email}" required>
             </div>
             <div class="input-group">
-                <label class="input-label">Department</label>
-                <input type="text" name="department" class="input-field" value="${emp.department}" required>
+                <label class="input-label">Email</label>
+                <input type="email" name="email" class="input-field" value="${emp.email}" required>
             </div>
             
             <div class="mt-4 p-4 border rounded bg-gray-50 flex items-center justify-between" style="border-color: var(--border-color);">
@@ -409,8 +408,7 @@ const dataManager = {
         ui.openModal('Edit Employee', fields, async (fd) => {
             await this.updateEmployee(id, {
                 name: fd.get('name'),
-                email: fd.get('email'),
-                department: fd.get('department')
+                email: fd.get('email')
             });
         });
 
@@ -626,8 +624,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     router.navigate('employees');
 
     // Forms
-    document.getElementById('form-employee').addEventListener('submit', dataManager.createEmployee);
-    document.getElementById('form-asset').addEventListener('submit', dataManager.createAsset);
+    document.getElementById('form-employee').addEventListener('submit', (e) => dataManager.createEmployee(e));
+    document.getElementById('form-asset').addEventListener('submit', (e) => dataManager.createAsset(e));
 
     // Initial Tab State (fix button styles)
     ui.toggleAddTab('employee');
