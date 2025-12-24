@@ -16,6 +16,7 @@ create table public.assets (
   type text not null check (type in ('Desktop', 'Mouse', 'Keyboard', 'Laptop', 'Monitor')), -- Extended list for realism
   brand text not null,
   serial_number text not null,
+  connectivity text check (connectivity in ('Wired', 'Wireless')),
   status text not null check (status in ('Working', 'Repair', 'Replaced')),
   employee_id uuid references public.employees(id) on delete set null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null

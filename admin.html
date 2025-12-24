@@ -144,6 +144,24 @@
         </div>
     </div>
 
+    <!-- MODAL FOR EDITING -->
+    <div id="edit-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Edit Item</h3>
+                <button class="close-btn" onclick="ui.closeModal()">&times;</button>
+            </div>
+            <form id="edit-form">
+                <!-- Fields injected dynamically -->
+                <div id="modal-fields"></div>
+                <div class="mt-4 flex gap-2">
+                    <button type="button" class="btn btn-outline w-full" onclick="ui.closeModal()">Cancel</button>
+                    <button type="submit" class="btn w-full">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="router.navigate('employees')" id="nav-employees">
@@ -176,9 +194,9 @@
     </nav>
 
     <!-- Scripts -->
-    <script src="js/supabase-client.js?v=2"></script>
-    <script src="js/auth.js?v=2"></script>
-    <script src="js/admin.js?v=2"></script>
+    <script src="js/supabase-client.js?v=3"></script>
+    <script src="js/auth.js?v=3"></script>
+    <script src="js/admin.js?v=3"></script>
 </body>
 
 </html>

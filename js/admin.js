@@ -63,6 +63,27 @@ const ui = {
         }
     },
 
+    // Modal Helpers
+    openModal(title, fields, onSave) {
+        document.getElementById('modal-title').textContent = title;
+        const container = document.getElementById('modal-fields');
+        container.innerHTML = fields;
+
+        document.getElementById('edit-modal').classList.remove('hidden');
+
+        // Handle form submission
+        const form = document.getElementById('edit-form');
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            await onSave(new FormData(form));
+            this.closeModal();
+        }
+    },
+
+    closeModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+    },
+
     renderEmployeeCard(emp) {
         const div = document.createElement('div');
         div.className = 'card';
@@ -75,9 +96,15 @@ const ui = {
                 </div>
                 <div id="qr-${emp.id}"></div>
             </div>
-            <div class="mt-4 flex gap-2">
-                <a href="employee.html?id=${emp.id}" target="_blank" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">View Public</a>
-                <button onclick="dataManager.downloadQR('${emp.id}', '${emp.name}')" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Save QR</button>
+            <div class="mt-4 flex justify-between items-center">
+                <div class="flex gap-2">
+                    <a href="employee.html?id=${emp.id}" target="_blank" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">View Public</a>
+                    <button onclick="dataManager.downloadQR('${emp.id}', '${emp.name}')" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Save QR</button>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="dataManager.openEditEmployee('${emp.id}')" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Edit</button>
+                    <button onclick="dataManager.deleteEmployee('${emp.id}')" class="btn btn-danger" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Delete</button>
+                </div>
             </div>
         `;
 
@@ -86,7 +113,6 @@ const ui = {
             const qrContainer = div.querySelector(`#qr-${emp.id}`);
             // Clear prev
             qrContainer.innerHTML = '';
-            // URL
             // URL: Use replace on current HREF to keep the repo path (for GitHub Pages)
             const url = window.location.href.replace('admin.html', 'employee.html').split('#')[0] + `?id=${emp.id}`;
             new QRCode(qrContainer, {
@@ -106,16 +132,21 @@ const ui = {
         const div = document.createElement('div');
         div.className = 'card';
         const colorClass = asset.status === 'Working' ? 'status-working' : (asset.status === 'Repair' ? 'status-repair' : 'status-replaced');
+        const connectivityBadge = asset.connectivity ? `<span style="font-size: 0.7rem; background: #eee; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">${asset.connectivity}</span>` : '';
 
         div.innerHTML = `
             <div class="flex justify-between">
-                <h4>${asset.brand} <span style="font-weight: 400; color: var(--text-muted);">(${asset.type})</span></h4>
+                <h4>${asset.brand} <span style="font-weight: 400; color: var(--text-muted);">(${asset.type})</span> ${connectivityBadge}</h4>
                 <span class="status-badge ${colorClass}">${asset.status}</span>
             </div>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">S/N: ${asset.serial_number}</p>
             <p style="font-size: 0.9rem; margin-top: 8px;">
                 Assigned to: <strong>${asset.employees ? asset.employees.name : 'Unassigned'}</strong>
             </p>
+            <div class="mt-4 text-right flex justify-end gap-2">
+                <button onclick="dataManager.openEditAsset('${asset.id}')" class="btn btn-outline" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Edit</button>
+                <button onclick="dataManager.deleteAsset('${asset.id}')" class="btn btn-danger" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">Delete</button>
+            </div>
         `;
         return div;
     }
@@ -229,6 +260,7 @@ const dataManager = {
             brand: fd.get('brand'),
             serial_number: fd.get('serial_number'),
             status: fd.get('status'),
+            connectivity: fd.get('connectivity'), // Add connectivity
             employee_id: fd.get('employee_id') || null
         };
 
@@ -249,6 +281,36 @@ const dataManager = {
         btn.textContent = 'Add Asset';
     },
 
+    async deleteEmployee(id) {
+        if (!confirm('Are you sure you want to delete this employee? This will also unassign their assets.')) return;
+
+        const { error } = await window.supabaseClient
+            .from('employees')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            alert('Error deleting: ' + error.message);
+        } else {
+            this.loadEmployees();
+        }
+    },
+
+    async deleteAsset(id) {
+        if (!confirm('Are you sure you want to delete this asset?')) return;
+
+        const { error } = await window.supabaseClient
+            .from('assets')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            alert('Error deleting: ' + error.message);
+        } else {
+            this.loadAssets();
+        }
+    },
+
     downloadQR(id, name) {
         const div = document.getElementById(`qr-${id}`);
         const img = div.querySelector('img');
@@ -257,6 +319,120 @@ const dataManager = {
             link.href = img.src;
             link.download = `QR_${name.replace(/\s+/g, '_')}.png`;
             link.click();
+        }
+    },
+
+    // Edit Logic
+    async openEditEmployee(id) {
+        const { data: emp } = await window.supabaseClient.from('employees').select('*').eq('id', id).single();
+        if (!emp) return;
+
+        const fields = `
+            <div class="input-group">
+                <label class="input-label">Full Name</label>
+                <input type="text" name="name" class="input-field" value="${emp.name}" required>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Email</label>
+                <input type="email" name="email" class="input-field" value="${emp.email}" required>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Department</label>
+                <input type="text" name="department" class="input-field" value="${emp.department}" required>
+            </div>
+        `;
+
+        ui.openModal('Edit Employee', fields, async (fd) => {
+            await this.updateEmployee(id, {
+                name: fd.get('name'),
+                email: fd.get('email'),
+                department: fd.get('department')
+            });
+        });
+    },
+
+    async updateEmployee(id, updates) {
+        const { error } = await window.supabaseClient.from('employees').update(updates).eq('id', id);
+        if (error) alert('Error updating: ' + error.message);
+        else {
+            this.loadEmployees();
+        }
+    },
+
+    async openEditAsset(id) {
+        const { data: asset } = await window.supabaseClient.from('assets').select('*').eq('id', id).single();
+        if (!asset) return;
+
+        // Get employees for dropdown
+        const { data: employees } = await window.supabaseClient.from('employees').select('id, name').order('name');
+        let options = '<option value="">-- Unassigned --</option>';
+        if (employees) {
+            employees.forEach(e => {
+                const selected = e.id === asset.employee_id ? 'selected' : '';
+                options += `<option value="${e.id}" ${selected}>${e.name}</option>`;
+            });
+        }
+
+        const isMouseOrKeyboard = ['Mouse', 'Keyboard'].includes(asset.type);
+        const connectivityHtml = isMouseOrKeyboard ? `
+            <div class="input-group">
+                <label class="input-label">Connectivity</label>
+                <select name="connectivity" class="input-field">
+                    <option value="Wireless" ${asset.connectivity === 'Wireless' ? 'selected' : ''}>Wireless</option>
+                    <option value="Wired" ${asset.connectivity === 'Wired' ? 'selected' : ''}>Wired</option>
+                </select>
+            </div>
+        ` : '';
+
+        const fields = `
+            <div class="input-group">
+                <label class="input-label">Type</label>
+                <input type="text" class="input-field" value="${asset.type}" disabled style="background: #eee;">
+            </div>
+            <div class="input-group">
+                <label class="input-label">Brand</label>
+                <input type="text" name="brand" class="input-field" value="${asset.brand}" required>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Serial Number</label>
+                <input type="text" name="serial_number" class="input-field" value="${asset.serial_number}" required>
+            </div>
+            ${connectivityHtml}
+            <div class="input-group">
+                <label class="input-label">Status</label>
+                <select name="status" class="input-field" required>
+                    <option value="Working" ${asset.status === 'Working' ? 'selected' : ''}>Working</option>
+                    <option value="Repair" ${asset.status === 'Repair' ? 'selected' : ''}>Repair</option>
+                    <option value="Replaced" ${asset.status === 'Replaced' ? 'selected' : ''}>Replaced</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Assigned To</label>
+                <select name="employee_id" class="input-field">
+                    ${options}
+                </select>
+            </div>
+        `;
+
+        ui.openModal('Edit Asset', fields, async (fd) => {
+            const updates = {
+                brand: fd.get('brand'),
+                serial_number: fd.get('serial_number'),
+                status: fd.get('status'),
+                employee_id: fd.get('employee_id') || null
+            };
+            if (isMouseOrKeyboard) {
+                updates.connectivity = fd.get('connectivity');
+            }
+            await this.updateAsset(id, updates);
+        });
+    },
+
+    async updateAsset(id, updates) {
+        const { error } = await window.supabaseClient.from('assets').update(updates).eq('id', id);
+        if (error) alert('Error updating: ' + error.message);
+        else {
+            this.loadAssets();
         }
     }
 };
@@ -282,4 +458,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Initial Tab State (fix button styles)
     ui.toggleAddTab('employee');
+
+    // Connectivity Field Toggle logic for Add Form
+    const assetTypeSelect = document.querySelector('select[name="type"]');
+    const connectivityDiv = document.createElement('div');
+    connectivityDiv.className = 'input-group hidden';
+    connectivityDiv.id = 'add-connectivity-group';
+    connectivityDiv.innerHTML = `
+        <label class="input-label">Connectivity</label>
+        <select name="connectivity" class="input-field">
+            <option value="Wireless">Wireless</option>
+            <option value="Wired">Wired</option>
+        </select>
+    `;
+    // Insert after Type
+    assetTypeSelect.closest('.input-group').after(connectivityDiv);
+
+    assetTypeSelect.addEventListener('change', (e) => {
+        if (['Mouse', 'Keyboard'].includes(e.target.value)) {
+            connectivityDiv.classList.remove('hidden');
+        } else {
+            connectivityDiv.classList.add('hidden');
+        }
+    });
 });
