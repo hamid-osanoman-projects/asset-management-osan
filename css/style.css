@@ -307,11 +307,27 @@ a {
     justify-content: center;
 }
 
+/* Card QR Preview (List View) - Smaller than Modal */
+.card-qr-preview {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    background: white;
+    padding: 2px;
+    border-radius: 4px;
+    /* Slightly squarer than main radius */
+}
+
+/* Common img styles for QR containers */
 .qr-preview-box img,
-.qr-preview-box canvas {
+.qr-preview-box canvas,
+.card-qr-preview img,
+.card-qr-preview canvas {
     width: 100% !important;
     height: 100% !important;
     object-fit: contain;
+    display: block;
+    /* Remove inline-block gap */
 }
 
 .modal-header {

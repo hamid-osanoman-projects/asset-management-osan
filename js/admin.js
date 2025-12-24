@@ -106,7 +106,8 @@ const ui = {
                     <p style="font-size: 0.8rem;">${emp.email}</p>
                     ${emp.custom_id ? `<span class="status-badge" style="background:#eee; color:#333; margin-top:4px; display:inline-block;">${emp.custom_id}</span>` : ''}
                 </div>
-                <div id="qr-${emp.id}"></div>
+                <!-- Container with fixed CSS size -->
+                <div id="qr-${emp.id}" class="card-qr-preview"></div>
             </div>
             <div class="mt-4 flex justify-between items-center">
                 <div id="qr-${emp.id}" class="hidden"></div> <!-- Hidden by default, only used for data -->
