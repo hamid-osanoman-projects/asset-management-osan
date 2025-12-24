@@ -127,9 +127,11 @@ a {
 .card {
     background-color: var(--card-bg);
     border-radius: var(--radius);
-    padding: 1.5rem;
-    box-shadow: var(--shadow);
+    padding: 1.25rem;
     margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    /* Subtle shadow */
+    border: 1px solid var(--border-color);
 }
 
 .input-group {
@@ -232,6 +234,35 @@ a {
 .status-replaced {
     background-color: #fceae9;
     color: #e74c3c;
+}
+
+/* Icon Buttons */
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.icon-btn.delete:hover {
+    color: #e74c3c;
+    background-color: #fceae9;
+}
+
+.icon-btn svg {
+    width: 20px;
+    height: 20px;
 }
 
 /* Modal */
