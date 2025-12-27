@@ -88,7 +88,7 @@ const ui = {
 
 
         // Handle form submission
-        // const form = document.getElementById('edit-form'); // Already declared above
+        const form = document.getElementById('edit-form');
         form.onsubmit = async (e) => {
             e.preventDefault();
             await onSave(new FormData(form));
