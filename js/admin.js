@@ -396,6 +396,7 @@ const dataManager = {
                 <label class="input-label">Full Name</label>
                 <input type="text" name="name" class="input-field" value="${emp.name}" required>
             </div>
+            <div class="input-group">
                 <label class="input-label">Email</label>
                 <input type="email" name="email" class="input-field" value="${emp.email}" required>
             </div>
