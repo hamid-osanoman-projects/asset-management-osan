@@ -72,13 +72,18 @@ const ui = {
         document.getElementById('edit-modal').classList.remove('hidden');
 
         // Reset buttons visibility (in case hidden by view assets)
-        const form = document.getElementById('edit-form');
-        const btns = form.querySelectorAll('button');
-        if (btns.length >= 2) {
-            btns[0].textContent = "Cancel";
-            btns[0].classList.remove('hidden');
-            btns[1].textContent = "Save Changes";
-            btns[1].classList.remove('hidden');
+        // Reset buttons visibility (in case hidden by view assets)
+        const btnCancel = document.getElementById('modal-btn-cancel');
+        const btnSave = document.getElementById('modal-btn-save');
+
+        if (btnCancel && btnSave) {
+            btnCancel.textContent = "Cancel";
+            btnCancel.classList.remove('hidden');
+            btnSave.textContent = "Save Changes";
+            btnSave.classList.remove('hidden');
+
+            // Clear specific logic assignments if any (standard reset)
+            btnCancel.onclick = () => this.closeModal();
         }
 
 
