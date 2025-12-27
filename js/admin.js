@@ -396,7 +396,9 @@ const dataManager = {
             link.click();
             document.body.removeChild(link);
         } else {
-            alert('QR Code not ready yet. Please wait a moment.');
+            // Debugging for User
+            const childTags = Array.from(div.children).map(c => c.tagName).join(', ');
+            alert(`Unable to download. Debug info: Found tags [${childTags}]. Image source present: ${img ? !!img.src : 'N/A'}`);
         }
     },
 
