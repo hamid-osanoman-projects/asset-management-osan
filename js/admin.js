@@ -373,12 +373,25 @@ const dataManager = {
         const div = document.getElementById(targetId);
         if (!div) return;
 
+        let src = '';
         const img = div.querySelector('img');
-        if (img) {
+        const canvas = div.querySelector('canvas');
+
+        if (img && img.src) {
+            src = img.src;
+        } else if (canvas) {
+            src = canvas.toDataURL("image/png");
+        }
+
+        if (src) {
             const link = document.createElement('a');
-            link.href = img.src;
+            link.href = src;
             link.download = `QR_${name.replace(/\s+/g, '_')}.png`;
+            document.body.appendChild(link); // Required for some browsers (Firefox/Mobile)
             link.click();
+            document.body.removeChild(link);
+        } else {
+            alert('QR Code not ready yet. Please wait a moment.');
         }
     },
 
