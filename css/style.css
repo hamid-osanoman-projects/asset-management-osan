@@ -353,6 +353,7 @@ a {
 
 .list-item:hover {
     background-color: var(--bg-secondary);
+    color: var(--text-secondary);
 }
 
 .list-item-info {
@@ -416,4 +417,55 @@ a {
     font-size: 1.5rem;
     cursor: pointer;
     color: var(--text-muted);
+}
+
+/* Responsive Header Grid */
+/* Responsive Header Grid */
+.view-header-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "title"
+        "search";
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.view-header-grid h2 {
+    grid-area: title;
+    margin-bottom: 0;
+    /* Remove default margin */
+}
+
+
+
+.view-header-grid .search-container {
+    grid-area: search;
+    width: 100%;
+}
+
+.view-header-grid input {
+    width: 100% !important;
+    /* Force full width on mobile */
+}
+
+/* Desktop override */
+@media (min-width: 600px) {
+    .view-header-grid {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        grid-template-areas: none;
+    }
+
+    .view-header-grid .search-container {
+        width: auto;
+        flex-grow: 0;
+    }
+
+    .view-header-grid input {
+        width: 250px !important;
+        /* Restore fixed width on desktop */
+    }
 }

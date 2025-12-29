@@ -24,13 +24,11 @@
 
         <!-- VIEW: EMPLOYEES -->
         <div id="view-employees" class="view-section container">
-            <div class="flex justify-between items-center mb-4">
+            <div class="view-header-grid mb-4">
                 <h2>Employees</h2>
-                <div class="flex gap-2">
+                <div class="search-container">
                     <input type="text" id="search-employee" placeholder="Search by ID (e.g. EMP-01)..."
-                        class="input-field" style="padding: 0.5rem; width: 250px;">
-                    <button onclick="router.navigate('add')" class="btn btn-outline" style="padding: 0.5rem;">+
-                        New</button>
+                        class="input-field" style="padding: 0.5rem;">
                 </div>
             </div>
             <div id="employee-list" class="flex-col gap-4">
@@ -43,7 +41,7 @@
         <div id="view-assets" class="view-section container hidden">
             <div class="flex justify-between items-center mb-4">
                 <h2>Assets</h2>
-                <button onclick="router.navigate('add')" class="btn btn-outline" style="padding: 0.5rem;">+ New</button>
+                <button onclick="router.navigate('add')" class="btn btn-outline" style="padding: 0.5rem;">New</button>
             </div>
             <div id="asset-list" class="flex-col gap-4">
                 <!-- Asset items will be injected here -->
