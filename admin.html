@@ -26,7 +26,12 @@
         <div id="view-employees" class="view-section container">
             <div class="flex justify-between items-center mb-4">
                 <h2>Employees</h2>
-                <button onclick="router.navigate('add')" class="btn btn-outline" style="padding: 0.5rem;">+ New</button>
+                <div class="flex gap-2">
+                    <input type="text" id="search-employee" placeholder="Search by ID (e.g. EMP-01)..."
+                        class="input-field" style="padding: 0.5rem; width: 250px;">
+                    <button onclick="router.navigate('add')" class="btn btn-outline" style="padding: 0.5rem;">+
+                        New</button>
+                </div>
             </div>
             <div id="employee-list" class="flex-col gap-4">
                 <!-- Employee items will be injected here -->
@@ -70,6 +75,12 @@
                             <option value="Osbic">Osbic</option>
                             <option value="ASAS">ASAS</option>
                             <option value="Maisarah">Maisarah</option>
+                            <option value="OSAN Investment">OSAN Investment</option>
+                            <option value="Musk Business Center">Musk Business Center</option>
+                            <option value="AMER Mawalah">AMER Mawalah</option>
+                            <option value="Sanad Center Ruwi">Sanad Center Ruwi</option>
+                            <option value="Tamkeen Alkhuwair">Tamkeen Alkhuwair</option>
+                            <option value="Typing Center Ruwi">Typing Center Ruwi</option>
                         </select>
                     </div>
                     <div class="input-group">

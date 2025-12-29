@@ -100,7 +100,7 @@ const ui = {
         document.getElementById('edit-modal').classList.add('hidden');
     },
 
-    renderEmployeeCard(emp) {
+    renderEmployeeCard(emp, assets = []) {
         const div = document.createElement('div');
         div.className = 'card';
         div.innerHTML = `
@@ -115,6 +115,20 @@ const ui = {
                 <div id="qr-${emp.id}" class="card-qr-preview"></div>
             </div>
             
+            ${assets.length > 0 ? `
+                <div class="mt-4 pt-3 border-t" style="border-color: var(--border-color);">
+                    <h5 class="text-sm font-semibold mb-2">Assigned Assets (${assets.length})</h5>
+                    <div class="flex flex-col gap-2">
+                        ${assets.map(a => `
+                            <div class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-100">
+                                <span class="text-sm">${a.brand} ${a.type}</span>
+                                <span class="text-xs px-2 py-0.5 rounded ${a.status === 'Working' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${a.status}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+
             <div class="mt-4 flex justify-between items-center border-t pt-3" style="border-color: var(--border-color);">
                 <div class="flex gap-2">
                     <button onclick="dataManager.viewEmployeeAssets('${emp.id}', '${emp.name}')" class="icon-btn" title="View Assigned Assets">
@@ -197,14 +211,20 @@ const ui = {
 
 // Data Manager
 const dataManager = {
-    async loadEmployees() {
+    async loadEmployees(searchQuery = '') {
         const list = document.getElementById('employee-list');
         list.innerHTML = '<div class="text-center" style="margin-top: 2rem; color: var(--text-muted);">Loading...</div>';
 
-        const { data, error } = await window.supabaseClient
+        let query = window.supabaseClient
             .from('employees')
             .select('*')
             .order('created_at', { ascending: false });
+
+        if (searchQuery) {
+            query = query.ilike('custom_id', `%${searchQuery}%`);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
             console.error(error);
@@ -218,8 +238,25 @@ const dataManager = {
             return;
         }
 
+        // If searching, also fetch assets to display inline
+        let assetsMap = {};
+        if (searchQuery) {
+            const empIds = data.map(e => e.id);
+            const { data: assets } = await window.supabaseClient
+                .from('assets')
+                .select('*')
+                .in('employee_id', empIds);
+
+            if (assets) {
+                assets.forEach(a => {
+                    if (!assetsMap[a.employee_id]) assetsMap[a.employee_id] = [];
+                    assetsMap[a.employee_id].push(a);
+                });
+            }
+        }
+
         data.forEach(emp => {
-            list.appendChild(ui.renderEmployeeCard(emp));
+            list.appendChild(ui.renderEmployeeCard(emp, assetsMap[emp.id] || []));
         });
     },
 
@@ -628,6 +665,12 @@ const dataManager = {
         else if (companyName === 'Osbic') prefix = 'OSB';
         else if (companyName === 'ASAS') prefix = 'AS';
         else if (companyName === 'Maisarah') prefix = 'MSH';
+        else if (companyName === 'OSAN Investment') prefix = 'OSN';
+        else if (companyName === 'Musk Business Center') prefix = 'MSK';
+        else if (companyName === 'AMER Mawalah') prefix = 'SCAMR';
+        else if (companyName === 'Sanad Center Ruwi') prefix = 'SCR';
+        else if (companyName === 'Tamkeen Alkhuwair') prefix = 'SCTMKN';
+        else if (companyName === 'Typing Center Ruwi') prefix = 'STCR';
 
         // Find last ID with this prefix
         const { data, error } = await window.supabaseClient
@@ -772,4 +815,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             connectivityDiv.classList.add('hidden');
         }
     });
+
+    // Search Handler
+    const searchInput = document.getElementById('search-employee');
+    let searchTimeout;
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                dataManager.loadEmployees(e.target.value.trim());
+            }, 300); // 300ms debounce
+        });
+    }
 });
